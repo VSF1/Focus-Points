@@ -27,6 +27,7 @@ local PointsRendererFactory = {}
 -- Required Lua definitions
 local AppleDelegates       = require 'AppleDelegates'
 local CanonDelegates       = require 'CanonDelegates'
+local KonicaMinoltaDelegates = require 'KonicaMinoltaDelegates'
 local DefaultDelegates     = require 'DefaultDelegates'
 local DefaultPointRenderer = require 'DefaultPointRenderer'
 local FujifilmDelegates    = require 'FujifilmDelegates'
@@ -82,6 +83,11 @@ function PointsRendererFactory.createRenderer(photo)
           -- since K-3, tested with K-3, K-1, K-1 Mark II. cameraMake is too unspecific, therefor we test against cameraModel as well
           or (string.find(cameraMake, "ricoh", 1, true))) then
     cameraMake = "pentax"
+    mapped = true
+  end
+
+  if string.find(cameraMake, "minolta", 1, true) then
+    cameraMake = "konica minolta"
     mapped = true
   end
 
@@ -205,6 +211,15 @@ function PointsRendererFactory.createRenderer(photo)
     DefaultPointRenderer.funcGetImageInfo    = SonyDelegates.getImageInfo
     DefaultPointRenderer.funcGetShootingInfo = SonyDelegates.getShootingInfo
     DefaultPointRenderer.funcGetFocusInfo    = SonyDelegates.getFocusInfo
+
+  elseif (cameraMake == "konica minolta") then
+    DefaultPointRenderer.funcModelSupported  = KonicaMinoltaDelegates.modelSupported
+    DefaultPointRenderer.funcMakerNotesFound = KonicaMinoltaDelegates.makerNotesFound
+    DefaultPointRenderer.funcManualFocusUsed = KonicaMinoltaDelegates.manualFocusUsed
+    DefaultPointRenderer.funcGetAfPoints     = KonicaMinoltaDelegates.getAfPoints
+    DefaultPointRenderer.funcGetImageInfo    = nil
+    DefaultPointRenderer.funcGetShootingInfo = nil
+    DefaultPointRenderer.funcGetFocusInfo    = nil
 
   else
     -- Unknown camera maker

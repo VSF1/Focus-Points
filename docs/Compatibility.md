@@ -25,8 +25,13 @@
   * Full-frame: α7, α9, α1 bodies beginning 2018 (with α7 III / α7R II) 
   * APS-C: α6100, α6300, α6400, α6500, α6600, α6700, ..
   * Compact: RX series, beginning 2015 (with RX10 II and RX100 IV)
+  * DSLR / SLT: DSLR-A900, SLT-A77V, SLT-A99V
   * Face detection
   
+
+* Konica Minolta
+  * Dynax 7D / Maxxum 7D
+
 
 * Fuji
   * Mirroless: X-series (from X100 in 2011 up to X-H2S today), GFX-series

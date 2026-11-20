@@ -37,12 +37,13 @@ local LrStringUtils        = import  'LrStringUtils'
 local LrView               = import  'LrView'
 
 -- Required Lua definitions
-local DefaultDelegates     = require 'DefaultDelegates'
-local DefaultPointRenderer = require 'DefaultPointRenderer'
-local ExifUtils            = require 'ExifUtils'
-local FocusInfo            = require 'FocusInfo'
-local Log                  = require 'Log'
-local Utils                = require 'Utils'
+local DefaultDelegates       = require 'DefaultDelegates'
+local Log                    = require 'Log'
+local DefaultPointRenderer   = require 'DefaultPointRenderer'
+local ExifUtils              = require 'ExifUtils'
+local FocusInfo              = require 'FocusInfo'
+local SonyLegacyPointLayouts = require 'SonyLegacyPointLayouts'
+local Utils                  = require 'Utils'
 
 -- Tag indicating that makernotes / AF section exists
 local metaKeyAfInfoSection = "Sony Model ID"
@@ -66,6 +67,8 @@ local metaKeyAfFacePosition              = "Face %s Position"
 local metaKeyAfSonyImageWidth            = "Sony Image Width"
 local metaKeyAfSonyImageHeight           = "Sony Image Height"
 local metaKeyAfPointsUsed                = "AF Points Used"
+local metaKeyAfPointSelected             = { "AF Points Selected", "AF Point Selected" }
+local metaKeyAfPointUsed                 = { "AF Points Used", "AF Point In Focus", "AF Point" }
 
 -- Image and Shooting Information relevant tags
 local metaKeyAPSCSizeCapture             = "APS-C Size Capture"
@@ -74,6 +77,87 @@ local metaKeyReleaseMode                 = "Release Mode"
 local metaKeySequenceNumber              = "Sequence Number"
 local metaKeyImageStabilization          = "Image Stabilization"
 
+local function splitPointNames(value)
+  if not value then return {} end
+  value = string.gsub(value, ";", ",")
+  local names = Utils.splitTrim(value, ",")
+  local normalized = {}
+  for _, name in ipairs(names) do
+    name = string.lower(name)
+    name = string.gsub(name, "^center.*", "center")
+    name = string.gsub(name, "fixed center", "center")
+    name = string.gsub(name, "e6 %(center%)", "e6")
+    table.insert(normalized, name)
+  end
+  return normalized
+end
+
+local function normalizePointName(name)
+  if string.sub(name, 1, 6) == "Center" then
+    return "center"
+  end
+  return string.lower(name)
+end
+
+local function getLegacyAfPoints(photo, metadata)
+  local model = DefaultDelegates.cameraModel or ""
+  local layout
+  local afType = ExifUtils.findValue(metadata, "AF Type")
+  if string.lower(model) == "dslr-a900" then
+    layout = SonyLegacyPointLayouts.a900
+  elseif afType then
+    afType = string.lower(afType)
+    if afType == "15-point" then
+      layout = SonyLegacyPointLayouts.points15
+    elseif afType == "19-point" then
+      layout = SonyLegacyPointLayouts.points19
+    elseif afType == "79-point" then
+      layout = SonyLegacyPointLayouts.points79
+    end
+  end
+  if not layout then return nil end
+
+  local width, height = DefaultPointRenderer.getNormalizedDimensions(photo, metadata)
+  local selected = splitPointNames(ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointSelected))
+  local inFocus = splitPointNames(ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointUsed))
+  local pointSize = width * (afType == "79-point" and 0.03 or 0.039)
+  local horizontalSpacing = width * 0.047
+  local verticalSpacing = horizontalSpacing
+  if afType == "79-point" then
+    pointSize = width * 0.03
+    horizontalSpacing = pointSize * 2.2
+    verticalSpacing = pointSize * 1.2
+  end
+
+  local result = {
+    pointTemplates = DefaultDelegates.pointTemplates,
+    points = {},
+  }
+  for _, point in ipairs(layout) do
+    local name = normalizePointName(point[1])
+    local altName = normalizePointName(point[2])
+    local isSelected = Utils.arrayKeyOf(selected, name) ~= nil
+      or (altName ~= "" and Utils.arrayKeyOf(selected, altName) ~= nil)
+    local isInFocus = Utils.arrayKeyOf(inFocus, name) ~= nil
+      or (altName ~= "" and Utils.arrayKeyOf(inFocus, altName) ~= nil)
+    local pointType = DefaultDelegates.POINTTYPE_AF_INACTIVE
+    if isInFocus then
+      pointType = DefaultDelegates.POINTTYPE_AF_FOCUS_BOX
+      FocusInfo.focusPointsDetected = true
+    elseif isSelected then
+      pointType = DefaultDelegates.POINTTYPE_AF_SELECTED
+      FocusInfo.focusPointsDetected = true
+    end
+    table.insert(result.points, {
+      pointType = pointType,
+      x = width / 2 + horizontalSpacing * point[3],
+      y = height / 2 + verticalSpacing * point[4],
+      width = pointSize,
+      height = pointSize,
+    })
+  end
+  return result
+end
 
 --[[----------------------------------------------------------------------------
   public table
@@ -82,6 +166,10 @@ local metaKeyImageStabilization          = "Image Stabilization"
   Retrieve the autofocus points from the metadata of the photo.
 ------------------------------------------------------------------------------]]
 function SonyDelegates.getAfPoints(photo, metadata)
+  local legacyPoints = getLegacyAfPoints(photo, metadata)
+  if legacyPoints then
+    return legacyPoints
+  end
 
   -- Get orginal dimensions (in native aspect ratio)
   local orgPhotoWidth, orgPhotoHeight = DefaultPointRenderer.getNormalizedDimensions(photo, metadata)
@@ -359,9 +447,11 @@ function SonyDelegates.modelSupported(model)
   -- Removing the series name leaves the model ID, e.g. '6400'
   local modelID = string.sub(model, #series+1)
 
-  if Utils.arrayKeyOf({"nex", "slt"}, string.sub(series, 1, 3)) then
-    -- NEX and SLT models are not supported
+  if string.sub(series, 1, 3) == "nex" then
+    -- NEX models are not supported
     return false
+  elseif string.sub(series, 1, 3) == "slt" then
+    return Utils.arrayKeyOf({"slt-a77v", "slt-a99v"}, model) ~= nil
   elseif series == "dsc-rx" then
     -- RX series supported with RX10M2, RX100M4 and later models
     return not Utils.arrayKeyOf({"1", "10", "100", "100m2", "100m3"}, modelID)
