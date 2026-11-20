@@ -931,7 +931,9 @@ Supported features:
 <sup>1</sup> Active AF point color can be chosen from red, green, blue in [Viewing Options](#viewing-options).<br>
 <sup>2</sup> 'Focus-pixel' shape and size can be chosen from different options (small box or medium/large with center dot) in [Viewing Options](#viewing-options).
 
-In Sony models, the focus point of an image is specified by the (x, y) coordinates in the `FocusLocation` tag. Newer models also support a `FocusFrameSize` tag, which specifies the size of the focus area. Custom focus frame size settings in the plugin's settings only apply when the focus frame size is not available in the metadata. In this case, medium and large focus boxes will display a center dot.
+On Sony models that record the `FocusLocation` tag, it specifies the (x, y) coordinates of the focus point. Newer models also support a `FocusFrameSize` tag, which specifies the size of the focus area. Custom focus frame size settings in the plugin's settings only apply when the focus frame size is not available in the metadata. In this case, medium and large focus boxes will display a center dot.
+
+The DSLR-A900 records named AF sensors rather than pixel coordinates. The plugin estimates their positions on the original image from the [A900 AF sensor diagram](https://www.imaging-resource.com/cameras/sony-a900-review/optics/), then maps them onto the Lightroom crop. The central sensor cluster is shown as one marker.
 
 <img src= "images/Sony 1a.jpg" alt="Sony 1a.jpg" style="width: 1000px;"/><br>
 α9. The focus point recorded by the camera corresponds to the center dot. The box is only there to make the dot more visible.<br><br>

@@ -22,7 +22,17 @@ local ExifUtils = require 'ExifUtils'
 local FocusInfo = require 'FocusInfo'
 local Utils = require 'Utils'
 
--- AF point centers for the Dynax 7D image dimensions (3008 x 2000).
+local supportedModels = {
+  ["dynax 5d"] = true,
+  ["maxxum 5d"] = true,
+  ["alpha sweet digital"] = true,
+  ["5d"] = true,
+  ["dynax 7d"] = true,
+  ["maxxum 7d"] = true,
+  ["7d"] = true,
+}
+
+-- Shared 5D/7D AF point centers in the uncropped 3008 x 2000 reference frame.
 local afPoints = {
   { "Top-left", 867, 740 },
   { "Top", 1504, 683 },
@@ -36,8 +46,7 @@ local afPoints = {
 }
 
 function KonicaMinoltaDelegates.modelSupported(model)
-  model = string.lower(model or "")
-  return model == "dynax 7d" or model == "maxxum 7d" or model == "7d"
+  return supportedModels[string.lower(model or "")] == true
 end
 
 function KonicaMinoltaDelegates.makerNotesFound(_photo, metadata)

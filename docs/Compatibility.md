@@ -30,6 +30,7 @@
   
 
 * Konica Minolta
+  * Dynax 5D / Maxxum 5D / Alpha Sweet Digital (uses the same nine-point layout as the 7D; highlighting requires focus metadata)
   * Dynax 7D / Maxxum 7D
 
 

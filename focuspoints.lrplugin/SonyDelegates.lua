@@ -101,9 +101,10 @@ end
 
 local function getLegacyAfPoints(photo, metadata)
   local model = DefaultDelegates.cameraModel or ""
+  local isA900 = model == "dslr-a900"
   local layout
   local afType = ExifUtils.findValue(metadata, "AF Type")
-  if string.lower(model) == "dslr-a900" then
+  if isA900 then
     layout = SonyLegacyPointLayouts.a900
   elseif afType then
     afType = string.lower(afType)
@@ -118,12 +119,27 @@ local function getLegacyAfPoints(photo, metadata)
   if not layout then return nil end
 
   local width, height = DefaultPointRenderer.getNormalizedDimensions(photo, metadata)
-  local selected = splitPointNames(ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointSelected))
-  local inFocus = splitPointNames(ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointUsed))
-  local pointSize = width * (afType == "79-point" and 0.03 or 0.039)
+  local selectedValue, inFocusValue
+  if isA900 then
+    selectedValue = ExifUtils.findValue(metadata, "AF Point Selected")
+    inFocusValue = ExifUtils.findValue(metadata, "AF Point")
+  end
+  local selected = splitPointNames(selectedValue or ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointSelected))
+  local inFocus = splitPointNames(inFocusValue or ExifUtils.findFirstMatchingValue(metadata, metaKeyAfPointUsed))
+  local pointSize = width * 0.039
   local horizontalSpacing = width * 0.047
   local verticalSpacing = horizontalSpacing
-  if afType == "79-point" then
+  if isA900 then
+    -- ExifTool names the outer sensors Left/Right in AF Point Selected
+    -- and Far Left/Far Right in AF Point (the sensor actually used).
+    for index, name in ipairs(selected) do
+      if name == "left" or name == "right" then
+        selected[index] = "far " .. name
+      end
+    end
+    horizontalSpacing = width
+    verticalSpacing = height
+  elseif afType == "79-point" then
     pointSize = width * 0.03
     horizontalSpacing = pointSize * 2.2
     verticalSpacing = pointSize * 1.2

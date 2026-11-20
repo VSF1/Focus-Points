@@ -288,13 +288,28 @@ function prepareRendering(photo, photoDisplayWidth, photoDisplayHeight, metadata
   local cropRotation = developSettings["CropAngle"]
   local cropLeft = developSettings["CropLeft"]
   local cropTop = developSettings["CropTop"]
+  local cropRight = developSettings["CropRight"]
+  local cropBottom = developSettings["CropBottom"]
+
+  -- The crop bounds are opposite corners in original image coordinates.
+  -- Use the same transform for the overlay and the size of the straightened crop.
+  local cropTransformation = a.rotate(math.rad(-cropRotation)) * a.trans(-cropLeft * originalWidth, -cropTop * originalHeight)
+  if cropRight and cropBottom then
+    local width, height = cropTransformation(cropRight * originalWidth, cropBottom * originalHeight)
+    if width > 0 and height > 0 then
+      cropWidth, cropHeight = width, height
+    else
+      Log.logWarn("DefaultPointRenderer", "Invalid crop bounds; using Lightroom's reported crop dimensions")
+    end
+  else
+    Log.logDebug("DefaultPointRenderer", "Incomplete crop bounds; using Lightroom's reported crop dimensions")
+  end
 
   Log.logDebug("DefaultPointRenderer", "originalDimensions: " .. originalWidth .. " x " .. originalHeight .. ", cropDimensions: " .. cropWidth .. " x " .. cropHeight .. ", displayDimensions: " .. photoDisplayWidth .. " x " .. photoDisplayHeight)
   Log.logDebug("DefaultPointRenderer", "exifRotation: " .. exifRotation .. "°, userRotation: " .. userRotation .. "°, userMirroring: " .. userMirroring)
   Log.logDebug("DefaultPointRenderer", "cropRotation: " .. cropRotation .. "°, cropLeft: " .. cropLeft .. ", cropTop: " .. cropTop)
 
   -- Build the transformation chain that maps coordinates from the original image space into the displayed image space
-  local cropTransformation = a.rotate(math.rad(-cropRotation)) * a.trans(-cropLeft * originalWidth, -cropTop * originalHeight)
   local userRotationTransformation
   local userMirroringTransformation
   local displayScalingTransformation

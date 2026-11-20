@@ -15,22 +15,24 @@
   limitations under the License.
 --]]
 return {
+  -- A900 offsets as fractions of the uncropped frame, estimated from the AF sensor diagram:
+  -- https://www.imaging-resource.com/cameras/sony-a900-review/optics/
   a900 = {
-    { "Center", "Center F2-8", 0, 0 },
-    { "Bottom", "Bottom", 0, 2 },
-    { "Bottom Assist-left", "", -1, 2 },
-    { "Bottom Assist-right", "", 1, 2 },
-    { "Top", "Top", 0, -2 },
-    { "Top Assist-left", "", -1, -2 },
-    { "Top Assist-right", "", 1, -2 },
-    { "Far Left", "Far Left", -5, 0 },
-    { "Far Right", "Far Right", 5, 0 },
-    { "Left", "Left", -3.5, 0 },
-    { "Lower-left", "", -3.5, 1.6 },
-    { "Lower-right", "", 3.5, 1.6 },
-    { "Right", "Right", 3.5, 0 },
-    { "Upper-left", "", -3.5, -1.6 },
-    { "Upper-right", "", 3.5, -1.6 },
+    { "Center", "", 0, 0 },
+    { "Bottom", "", 0, 0.144 },
+    { "Bottom Assist-left", "", -0.040, 0.144 },
+    { "Bottom Assist-right", "", 0.040, 0.144 },
+    { "Top", "", 0, -0.144 },
+    { "Top Assist-left", "", -0.040, -0.144 },
+    { "Top Assist-right", "", 0.040, -0.144 },
+    { "Far Left", "", -0.182, 0 },
+    { "Far Right", "", 0.182, 0 },
+    { "Left", "", -0.112, 0 },
+    { "Lower-left", "", -0.112, 0.060 },
+    { "Lower-right", "", 0.112, 0.060 },
+    { "Right", "", 0.112, 0 },
+    { "Upper-left", "", -0.112, -0.060 },
+    { "Upper-right", "", 0.112, -0.060 },
   },
   points15 = {
     { "Center (horizontal)", "Center", 0, 0 },
