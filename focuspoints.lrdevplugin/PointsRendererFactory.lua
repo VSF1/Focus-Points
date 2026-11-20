@@ -30,6 +30,7 @@ require "AppleDelegates"
 require "PentaxDelegates"
 require "NikonDuplicates"
 require "SonyDelegates"
+require "KonicaMinoltaDelegates"
 
 local LrErrors = import 'LrErrors'
 
@@ -83,9 +84,15 @@ function PointsRendererFactory.createRenderer(photo)
     DefaultDelegates.focusPointDimen = nil    -- unused
     DefaultPointRenderer.funcGetAfPoints = AppleDelegates.getAfPoints
   elseif (cameraMake == "sony") then
-    DefaultDelegates.focusPointsMap = nil     -- unused
-    DefaultDelegates.focusPointDimen = nil    -- unused
+	local pointsMap, pointDimen = PointsRendererFactory.getFocusPoints(photo, cameraMake, cameraModel)
+    DefaultDelegates.focusPointsMap = nil -- pointsMap
+    DefaultDelegates.focusPointDimen = nil -- pointDimen
     DefaultPointRenderer.funcGetAfPoints = SonyDelegates.getAfPoints
+  elseif (cameraMake == "konica minolta") then
+    local pointsMap, pointDimen = PointsRendererFactory.getFocusPoints(photo, cameraMake, cameraModel)
+    KonicaMinoltaDelegates.focusPointsMap = nil -- pointsMap
+    KonicaMinoltaDelegates.focusPointDimen = nil -- pointDimen
+    DefaultPointRenderer.funcGetAfPoints = KonicaMinoltaDelegates.getAfPoints
   elseif (cameraMake == "nikon corporation") then
     local pointsMap, pointDimen = PointsRendererFactory.getFocusPoints(photo, cameraMake, cameraModel)
     DefaultDelegates.focusPointsMap = pointsMap

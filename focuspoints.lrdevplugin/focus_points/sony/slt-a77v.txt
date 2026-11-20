@@ -1,0 +1,45 @@
+-- Sony A77
+-- Submitted by: vitor fonseca
+-- 24.0 MP, 6000x4000
+-- AF System: 19 point
+-- Coordinates represent the CENTER of the AF point
+
+-- point dimensions 300x250
+focusPointDimens = {110, 110}
+
+-- top row
+Top Horizontal = {1085, 489}
+Top Vertical = {300, 300}
+Upper Far Left = {300, 300}
+Upper Far Right = {300, 300}
+Upper-left Horizontal = {300, 300}
+Upper-left Vertical = {300, 300}
+Upper-middle = {300, 300}
+Upper-right Horizontal = {300, 300}
+Upper-right Vertical = {300, 300}
+-- center row
+Center = {3000, 2000}
+Center Horizontal = {3000, 2000}
+Center Vertical = {3000, 2000}
+
+-- bottom row
+Bottom Horizontal = {300, 250}
+Bottom Vertical = {300, 250}
+
+Far Left Horizontal = {300, 300}
+Far Left Vertical = {300, 300}
+Far Right Horizontal = {300, 300}
+Far Right Vertical = {300, 300}
+Left Horizontal = {300, 300}
+Left Vertical = {300, 300}
+Lower Far Left = {300, 300}
+Lower Far Right = {300, 300}
+Lower-left Horizontal ={300, 300} 
+Lower-left Vertical = {300, 300}
+Lower-middle = {300, 300}
+Lower-right Horizont = {300, 300}
+Lower-right Vertical = {300, 300}
+Near Left = {300, 300}
+Near Right = {300, 300}
+Right Horizontal = {300, 300}
+Right Vertical = {300, 300}

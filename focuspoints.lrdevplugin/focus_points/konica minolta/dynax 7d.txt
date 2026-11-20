@@ -1,0 +1,23 @@
+-- Konica Minolta 7D
+-- Submitted by: vitor fonseca
+-- 6.0 MP, 3008x2000
+-- AF System: 9 point
+-- Coordinates represent the CENTER of the AF point
+
+-- point dimensions
+focusPointDimens = {62, 62}
+
+-- top row
+Top-left  = {867, 740}
+Top       = {1504, 683}
+Top-right = {2150, 740}
+
+-- center row
+Left    = {1204, 1000}
+Center  = {1504, 1000}
+Right   = {1804, 1000}
+
+-- bottom row
+Bottom-left  = {867, 1270}
+Bottom       = {1504, 1317}
+Bottom-right = {2150, 1270}

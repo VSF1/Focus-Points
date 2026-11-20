@@ -26,8 +26,8 @@ function FocusPointDialog.calculatePhotoDimens(targetPhoto)
   local appWidth, appHeight = LrSystemInfo.appWindowSize()
   local dimens = targetPhoto:getFormattedMetadata("croppedDimensions")
   local w, h = parseDimens(dimens)
-  local contentWidth = appWidth * .7
-  local contentHeight = appHeight * .7
+  local contentWidth = appWidth * .5
+  local contentHeight = appHeight * .5
 
   local photoWidth
   local photoHeight
@@ -50,6 +50,7 @@ function FocusPointDialog.calculatePhotoDimens(targetPhoto)
 
 end
 
+
 function FocusPointDialog.createDialog(targetPhoto, photoView)
   local photoWidth, photoHeight = FocusPointDialog.calculatePhotoDimens(targetPhoto)
   local myView = nil
@@ -59,7 +60,7 @@ function FocusPointDialog.createDialog(targetPhoto, photoView)
   
   local viewFactory = LrView.osFactory()
   local myText = viewFactory:static_text {
-    title = "" -- "CL " .. developSettings["CropLeft"] .. ", CT " .. developSettings["CropTop"] .. ", Angle " .. developSettings["CropAngle"],
+    title = "CL " .. developSettings["CropLeft"] .. ", CT " .. developSettings["CropTop"] .. ", Angle " .. developSettings["CropAngle"],
   }
       
   local column = viewFactory:column {
@@ -72,3 +73,39 @@ function FocusPointDialog.createDialog(targetPhoto, photoView)
   return myView
   
 end
+
+--[[
+function FocusPointDialog.createDialog(targetPhoto, photoView)
+  local appWidth, appHeight = LrSystemInfo.appWindowSize()
+  local photoWidth, photoHeight = FocusPointDialog.calculatePhotoDimens(targetPhoto)
+  local myView = nil
+
+  -- temporary for dev'ing
+  local developSettings = targetPhoto:getDevelopSettings()
+  
+  local viewFactory = LrView.osFactory()
+  local myText = viewFactory:static_text {
+    title = "CL " .. developSettings["CropLeft"] .. ", CT " .. developSettings["CropTop"] .. ", Angle " .. developSettings["CropAngle"],
+  }
+  
+  for i=1, #developSettings do
+	logDebug("FocusPointDialog", developSettings[i])
+  end
+  
+  local column = viewFactory:column {
+    photoView, myText,
+  }
+  
+  local row = viewFactory:row {
+    photoView, myText,
+  }
+  
+  myView = viewFactory:scrolled_view {
+    row,  
+	width = appWidth * .5,
+    height = appHeight *.5,
+  }
+  return myView
+  
+end
+--]]

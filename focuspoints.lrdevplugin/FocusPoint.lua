@@ -24,6 +24,8 @@ local LrTasks = import 'LrTasks'
 local LrFileUtils = import 'LrFileUtils'
 local LrPathUtils = import 'LrPathUtils'
 local LrErrors = import 'LrErrors'
+--local LrMobdebug = import 'LrMobdebug'
+--LrMobdebug.start()
 
 require "FocusPointDialog"
 require "PointsRendererFactory"
@@ -80,6 +82,7 @@ local function showDialog()
 
     -- display the contents
     LrDialogs.presentModalDialog {
+	--LrDialogs.presentFloatingDialog {
       title = "Focus Point Viewer",
       cancelVerb = "< exclude >",
       actionVerb = "OK",
